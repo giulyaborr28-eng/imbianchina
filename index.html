@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effetto Bianchetto</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            overflow: hidden;
+            display: flex;
+            justify-center: center;
+            align-items: center;
+            height: 100vh;
+            cursor: crosshair; /* Cambia il cursore in un mirino */
+        }
+
+        /* Il foglio virtuale */
+        #canvas {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Adatta il canvas alla finestra del browser
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            disegnaPuntini();
+        }
+
+        // Funzione per generare i puntini neri casuali
+        function disegnaPuntini() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height); // Sfondo bianco
+
+            ctx.fillStyle = 'black';
+            // Genera 500 puntini casuali
+            for (let i = 0; i < 500; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2); // Puntini con raggio 3
+                ctx.fill();
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Logica del bianchetto (copre di bianco al passaggio del mouse/tocco)
+        let isDrawing = false;
+
+        function cancella(e) {
+            if (!isDrawing) return;
+
+            // Ottiene le coordinate del mouse o del tocco (mobile)
+            const x = e.clientX || e.touches[0].clientX;
+            const y = e.clientY || e.touches[0].clientY;
+
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            // Il cerchio bianco del bianchetto (raggio 20 pixel)
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Eventi per il mouse
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mousemove', cancella);
+
+        // Eventi per schermi touch (smartphone/tablet)
+        canvas.addEventListener('touchstart', () => isDrawing = true);
+        canvas.addEventListener('touchend', () => isDrawing = false);
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // Evita lo scroll della pagina mentre cancelli
+            cancella(e);
+        });
+    </script>
+</body>
+</html>
